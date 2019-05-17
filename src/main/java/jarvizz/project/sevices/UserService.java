@@ -4,6 +4,7 @@ import jarvizz.project.dao.UserDao;
 import jarvizz.project.models.AccountCredentials;
 import jarvizz.project.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
