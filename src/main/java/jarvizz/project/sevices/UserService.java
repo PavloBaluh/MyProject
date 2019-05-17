@@ -16,7 +16,8 @@ public class UserService{
     public User findByEmail (String email){
         return userdao.findByEmail(email);
     }
-    public User findByName(String name){return userdao.findByUsername(name);}
+    public User findByName(String name){
+        return userdao.findByUsername(name);}
     public void  save(User user){
         userdao.save(user);
     }

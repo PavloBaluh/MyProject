@@ -4,10 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jarvizz.project.models.AccountCredentials;
+import jarvizz.project.models.User;
+import jarvizz.project.sevices.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -22,6 +26,10 @@ import java.util.Date;
 
 
 public class LoginFilter extends AbstractAuthenticationProcessingFilter {
+    @Autowired
+    UserService userService;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     public LoginFilter(String url, AuthenticationManager authManager) {
         super(new AntPathRequestMatcher(url));
@@ -31,18 +39,18 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
-        creds = new ObjectMapper()
-                .readValue(httpServletRequest.getInputStream(), AccountCredentials.class);
-        System.out.println(creds);
-        System.out.println("!!!!!!!!!!");
-        return getAuthenticationManager().authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        creds.getUsername(),
-                        creds.getPassword(),
-                        Collections.emptyList()
-                )
-        );
-
+        creds = new ObjectMapper().readValue(httpServletRequest.getInputStream(), AccountCredentials.class);
+        System.out.println(creds.getUsername());
+        String name = creds.getUsername();
+        System.out.println(name);
+        User byName = userService.findByName(name);
+        if (byName != null){
+        if (passwordEncoder.encode(creds.getPassword()).equals(byName.getPassword())){
+           return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(), creds.getPassword(), Collections.emptyList()));
+        }
+        else return null;
+        }
+        else return null;
     }
 
     @Override
