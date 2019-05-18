@@ -32,11 +32,13 @@ import java.util.Date;
 
 
 public class LoginFilter extends AbstractAuthenticationProcessingFilter {
+    private PasswordEncoder passwordEncoder;
     private UserService userService;
-    public LoginFilter(String url, AuthenticationManager authManager, UserService userService) {
+    public LoginFilter(String url, AuthenticationManager authManager, UserService userService,PasswordEncoder passwordEncoder) {
         super(new AntPathRequestMatcher(url));
         setAuthenticationManager(authManager);
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
     private AccountCredentials creds;
 
@@ -44,7 +46,8 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
         creds = new ObjectMapper().readValue(httpServletRequest.getInputStream(), AccountCredentials.class);
-        if (userService.findByName(creds.getUsername()) != null) {
+        User byName = userService.findByName(creds.getUsername());
+        if (userService.findByName(creds.getUsername()) != null && passwordEncoder.matches(creds.getPassword(),byName.getPassword())) {
             return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(), creds.getPassword(), Collections.emptyList()));
         }
         else return null;
