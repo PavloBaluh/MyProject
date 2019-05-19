@@ -47,7 +47,7 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
         creds = new ObjectMapper().readValue(httpServletRequest.getInputStream(), AccountCredentials.class);
         User byName = userService.findByName(creds.getUsername());
-        if (userService.findByName(creds.getUsername()) != null && passwordEncoder.matches(creds.getPassword(),byName.getPassword())) {
+        if (userService.findByName(creds.getUsername()) != null && passwordEncoder.matches(creds.getPassword(),byName.getPassword()) && byName.isEnabled()) {
             return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(), creds.getPassword(), Collections.emptyList()));
         }
         else return null;

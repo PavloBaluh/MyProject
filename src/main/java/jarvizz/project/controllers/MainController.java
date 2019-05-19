@@ -166,18 +166,21 @@ public class MainController {
     public List<Orders> history() {
         String authentication = SecurityContextHolder.getContext().getAuthentication().getName();
         User byName = userService.findByName(authentication);
-        System.out.println(byName);
-        System.out.println(byName.getOrders());
         return byName.getOrders();
     }
 
 
    private void bonusMethod(User user, List<Food> foods, double sum){
        double foodsum = foods.stream().mapToDouble(Food::getPrice).sum();
-       if (sum<foodsum){
+       if (sum<foodsum && sum !=0){
            double spentBonuses =  foodsum - sum;
            UserInfo userInfo = user.getUserInfo();
            userInfo.setBonus(userInfo.getBonus() - spentBonuses);
+           userInfoService.save(userInfo);
+       }
+       if (sum ==0){
+           UserInfo userInfo = user.getUserInfo();
+           userInfo.setBonus(userInfo.getBonus() - foodsum);
            userInfoService.save(userInfo);
        }
    }

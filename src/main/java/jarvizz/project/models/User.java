@@ -63,7 +63,7 @@ public class User implements UserDetails {
     private boolean isEnabled = false;
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 
     public User(String username, String password, String email) {
