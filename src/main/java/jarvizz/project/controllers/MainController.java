@@ -104,11 +104,10 @@ public class MainController {
     }
 
     @PostMapping("/makeOrder/basket/{foods}")
-    public String makeOrder(HttpServletRequest request, @PathVariable("foods") String foodInp) throws IOException {
+    public void makeOrder(HttpServletRequest request, @PathVariable("foods") String foodInp) throws IOException {
         String[] split = foodInp.split(",");
         List<Food> foods = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//        List<Food> list = objectMapper.readValue(foodInp, TypeFactory.defaultInstance().constructCollectionType(List.class, Food.class));
         List<Food> list = new ArrayList<>();
         for (String s : split) {
             list.add(foodService.findByName(s));
@@ -126,11 +125,8 @@ public class MainController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && !authentication.getName().equals("anonymousUser")) {
             String name = authentication.getName();
-            System.out.println(name);
             User byName = userService.findByName(name);
-            System.out.println(byName);
             orders.setUser(byName);
-
             try {
                 List<Orders> orders1 = byName.getOrders();
                 orders1.add(orders);
@@ -157,13 +153,13 @@ public class MainController {
                 byName.setUserInfo(userInfo);
                 userService.save(byName);
             }
+            bonusMethod(byName,list,orders.getSum()); // calculate spent bonuses if they exist
 
 
         } else {
             orders.setFoods(foods);
             orderService.save(orders);
         }
-        return "";
     }
 
     @GetMapping("/history")
@@ -174,4 +170,15 @@ public class MainController {
         System.out.println(byName.getOrders());
         return byName.getOrders();
     }
+
+
+   private void bonusMethod(User user, List<Food> foods, double sum){
+       double foodsum = foods.stream().mapToDouble(Food::getPrice).sum();
+       if (sum<foodsum){
+           double spentBonuses =  foodsum - sum;
+           UserInfo userInfo = user.getUserInfo();
+           userInfo.setBonus(userInfo.getBonus() - spentBonuses);
+           userInfoService.save(userInfo);
+       }
+   }
 }

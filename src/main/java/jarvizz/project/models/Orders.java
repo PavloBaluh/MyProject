@@ -27,6 +27,7 @@ public class Orders implements Serializable{
     private String address;
     private String phoneNumber;
     private double bonus = 0.0;
+    private double sum = 0.0;
     @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.PERSIST,CascadeType.DETACH,CascadeType.REMOVE,CascadeType.REFRESH,},mappedBy = "orders")
     private List<Food>foods = new ArrayList<>();
     @JsonIgnore
