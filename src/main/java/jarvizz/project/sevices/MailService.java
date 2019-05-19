@@ -38,7 +38,7 @@ public class MailService {
              try {
                  mimeMessage.setFrom(new InternetAddress(env.getProperty("spring.mail.username")));
                  helper.setTo(email);
-                 helper.setSubject("Підтвердження регістраціїї на DELICIOUS RESTO");
+                 helper.setSubject("Підтвердження регістраціїї на GAME PLAY");
                  helper.addAttachment(file.getOriginalFilename(),file);
                  helper.setText("<h2>Привіт " + user.getUsername() + "</h2>" +
                          "<h3> Будь-ласка натисніть кнопку нижче для завершення регістрації \n </h3> "+
