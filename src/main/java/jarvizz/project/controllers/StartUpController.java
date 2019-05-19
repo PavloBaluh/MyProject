@@ -13,6 +13,7 @@ public class StartUpController {
     UserService userService;
     @GetMapping("/")
     public String home(){
+        System.out.println("helll");
         return "forward:/index.html";
     }
 

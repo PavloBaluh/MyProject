@@ -34,19 +34,6 @@ public class MainController {
     UserInfoService userInfoService;
     CardInfoService cardInfoService;
     OrderService orderService;
-//    @GetMapping("/")
-//    public String home (){
-////        String property = System.getProperty("user.dir") + File.separator + "icons" +  File.separator + "pizza.jpg";
-////        File file = new File(property);
-////        String name = file.getName();
-//
-//        String s = "Телятина гриль на крем-соусі з буряка та булгуром/ Салат з печеного буряка на горошковому пюре з ароматною олією";
-//        Food food = foodService.findAllByType(Type.BURGER).get(0);
-//        food.setDescription(s);
-//        foodService.save(food);
-//        return "lol";
-//    }
-
 
     @PostMapping("/register")
     public String register(@RequestHeader("username") String name,
