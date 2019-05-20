@@ -48,6 +48,7 @@ public class MainController {
             mailService.send(mail, userService.findByEmail(mail));
             return good;
         }
+
         return bad;
     }
 
