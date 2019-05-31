@@ -9,13 +9,17 @@ import com.fasterxml.jackson.databind.util.JSONPObject;
 import jarvizz.project.models.*;
 import jarvizz.project.sevices.*;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -52,6 +56,24 @@ public class MainController {
         return bad;
     }
 
+    @PostMapping("/fileUpload")
+    public String fileUpload (@RequestParam("fileKey") MultipartFile file){
+
+        String pass = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects"
+                + File.separator + "FrontForProject" + File.separator + "src" + File.separator + "assets" + File.separator + "UsersImages";
+        System.out.println( System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects" + File.separator + "images" + File.separator + "userIcons");
+        File file1 = new File(pass);
+        if (!file1.exists()) {
+            file1.mkdir();
+        }
+        try {
+            file.transferTo(new File(pass + File.separator +  file.getOriginalFilename()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     @GetMapping("/basket")
     public List<Food> basket() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -63,7 +85,6 @@ public class MainController {
 
     @PostMapping("/updateUserInfo")
     public void updateUserInfo(HttpServletRequest request) throws IOException {
-        System.out.println(request.getInputStream());
         UserInfo userInfo = new ObjectMapper().readValue(request.getInputStream(), UserInfo.class);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String name = authentication.getName();
@@ -82,6 +103,7 @@ public class MainController {
             userService.save(user);
         }
     }
+
 
     @GetMapping("/getUserInfo")
     public UserInfo getUserInfo() {
@@ -141,7 +163,7 @@ public class MainController {
                 byName.setUserInfo(userInfo);
                 userService.save(byName);
             }
-            bonusMethod(byName,list,orders.getSum()); // calculate spent bonuses if they exist
+            bonusMethod(byName, list, orders.getSum()); // calculate spent bonuses if they exist
 
 
         } else {
@@ -158,18 +180,18 @@ public class MainController {
     }
 
 
-   private void bonusMethod(User user, List<Food> foods, double sum){
-       double foodsum = foods.stream().mapToDouble(Food::getPrice).sum();
-       if (sum<foodsum && sum !=0){
-           double spentBonuses =  foodsum - sum;
-           UserInfo userInfo = user.getUserInfo();
-           userInfo.setBonus(userInfo.getBonus() - spentBonuses);
-           userInfoService.save(userInfo);
-       }
-       if (sum ==0){
-           UserInfo userInfo = user.getUserInfo();
-           userInfo.setBonus(userInfo.getBonus() - foodsum);
-           userInfoService.save(userInfo);
-       }
-   }
+    private void bonusMethod(User user, List<Food> foods, double sum) {
+        double foodsum = foods.stream().mapToDouble(Food::getPrice).sum();
+        if (sum < foodsum && sum != 0) {
+            double spentBonuses = foodsum - sum;
+            UserInfo userInfo = user.getUserInfo();
+            userInfo.setBonus(userInfo.getBonus() - spentBonuses);
+            userInfoService.save(userInfo);
+        }
+        if (sum == 0) {
+            UserInfo userInfo = user.getUserInfo();
+            userInfo.setBonus(userInfo.getBonus() - foodsum);
+            userInfoService.save(userInfo);
+        }
+    }
 }

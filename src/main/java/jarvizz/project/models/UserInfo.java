@@ -23,6 +23,7 @@ public class UserInfo {
     @Nationalized
     private String address;
     private double bonus = 0.0;
+    private String picture;
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
