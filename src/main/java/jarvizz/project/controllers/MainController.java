@@ -1,15 +1,11 @@
 package jarvizz.project.controllers;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.sun.org.apache.xml.internal.security.utils.Base64;
 import jarvizz.project.models.*;
 import jarvizz.project.sevices.*;
 import lombok.AllArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,11 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
-import java.awt.*;
-import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,21 +49,26 @@ public class MainController {
     }
 
     @PostMapping("/fileUpload")
-    public String fileUpload (@RequestParam("fileKey") MultipartFile file){
+    public String fileUpload(@RequestParam("fileKey") MultipartFile file) throws IOException {
+        String encode = Base64.encode(file.getBytes());
+        System.out.println(encode);
+//        Map<String, String> jsonMap = new HashMap<>();
+//        jsonMap.put("content", encode);
+//        JSONObject jsonObject = new JSONObject(jsonMap);
 
-        String pass = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects"
-                + File.separator + "FrontForProject" + File.separator + "src" + File.separator + "assets" + File.separator + "UsersImages";
-        System.out.println( System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects" + File.separator + "images" + File.separator + "userIcons");
-        File file1 = new File(pass);
-        if (!file1.exists()) {
-            file1.mkdir();
-        }
-        try {
-            file.transferTo(new File(pass + File.separator +  file.getOriginalFilename()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
+//        String pass = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects"
+//                + File.separator + "FrontForProject" + File.separator + "src" + File.separator + "assets" + File.separator + "UsersImages";
+//        System.out.println(System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects" + File.separator + "images" + File.separator + "userIcons");
+//        File file1 = new File(pass);
+//        if (!file1.exists()) {
+//            file1.mkdir();
+//        }
+//        try {
+//            file.transferTo(new File(pass + File.separator + file.getOriginalFilename()));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        return encode;
     }
 
     @GetMapping("/basket")
