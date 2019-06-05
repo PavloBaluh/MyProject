@@ -6,6 +6,8 @@ import com.sun.org.apache.xml.internal.security.utils.Base64;
 import jarvizz.project.models.*;
 import jarvizz.project.sevices.*;
 import lombok.AllArgsConstructor;
+import org.apache.commons.io.IOUtils;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,33 +53,51 @@ public class MainController {
     }
 
     @PostMapping("/fileUpload")
-    public String fileUpload(@RequestParam("fileKey") MultipartFile file) throws IOException {
+    public String fileUpload(@RequestPart("fileKey") MultipartFile file) throws IOException {
+        String authentication = SecurityContextHolder.getContext().getAuthentication().getName();
+        User byName = userService.findByName(authentication);
         String encode = Base64.encode(file.getBytes());
-        System.out.println(encode);
-//        Map<String, String> jsonMap = new HashMap<>();
-//        jsonMap.put("content", encode);
-//        JSONObject jsonObject = new JSONObject(jsonMap);
-
-//        String pass = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects"
-//                + File.separator + "FrontForProject" + File.separator + "src" + File.separator + "assets" + File.separator + "UsersImages";
-//        System.out.println(System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects" + File.separator + "images" + File.separator + "userIcons");
-//        File file1 = new File(pass);
-//        if (!file1.exists()) {
-//            file1.mkdir();
-//        }
-//        try {
-//            file.transferTo(new File(pass + File.separator + file.getOriginalFilename()));
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+       String pass = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources"
+                + File.separator + "static" + File.separator + "assets" + File.separator + "usersImages" + File.separator;
+        if (byName.getUserInfo().getPicture() != null){
+            System.out.println(byName.getUserInfo().getPicture());
+            String picture = byName.getUserInfo().getPicture();
+             File file1 = new File(pass + picture);
+             file1.delete();
+        }
+        File file1 = new File(pass);
+        if (!file1.exists()) {
+            file1.mkdir();
+        }
+        try {
+            file.transferTo(new File(pass + File.separator + file.getOriginalFilename()));
+        } catch (IOException e) {
+           return null;
+        }
         return encode;
+    }
+    @GetMapping("/getUserImage/{imgName}")
+    public String getUserImage (@PathVariable("imgName") String img) throws IOException {
+        String pass = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources"
+                + File.separator + "static" + File.separator + "assets" + File.separator + "usersImages" + File.separator;
+        File file = new File(pass + img);
+        FileInputStream input = new FileInputStream(file);
+        MultipartFile multipartFile = new MockMultipartFile("fileItem",
+                file.getName(), "image/png", IOUtils.toByteArray(input));
+        try {
+            String encode = Base64.encode(multipartFile.getBytes());
+            input.close();
+            return encode;
+        } catch (IOException e) {
+            input.close();
+            return null;
+        }
     }
 
     @GetMapping("/basket")
     public List<Food> basket() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String name = authentication.getName();
-        System.out.println(name);
         User user = userService.findByName(name);
         return user.getBasket();
     }
@@ -92,6 +114,7 @@ public class MainController {
             userInfo1.setName(userInfo.getName());
             userInfo1.setPhoneNumber(userInfo.getPhoneNumber());
             userInfo1.setSurname(userInfo.getSurname());
+            userInfo1.setPicture(userInfo.getPicture());
             userInfoService.save(userInfo1);
         } else {
             userInfo.setUser(user);
