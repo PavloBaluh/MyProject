@@ -71,6 +71,8 @@ public class MainController {
         }
         try {
             file.transferTo(new File(pass + File.separator + file.getOriginalFilename()));
+            byName.getUserInfo().setPicture(file.getOriginalFilename());
+            userInfoService.save(byName.getUserInfo());
         } catch (IOException e) {
            return null;
         }
@@ -114,7 +116,6 @@ public class MainController {
             userInfo1.setName(userInfo.getName());
             userInfo1.setPhoneNumber(userInfo.getPhoneNumber());
             userInfo1.setSurname(userInfo.getSurname());
-            userInfo1.setPicture(userInfo.getPicture());
             userInfoService.save(userInfo1);
         } else {
             userInfo.setUser(user);
