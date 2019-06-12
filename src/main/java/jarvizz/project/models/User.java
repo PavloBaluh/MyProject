@@ -72,4 +72,10 @@ public class User implements UserDetails {
         this.email = email;
     }
 
+    public User(String username, String password,  Roles roles, boolean bool) {
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+        this.isEnabled = bool;
+    }
 }
