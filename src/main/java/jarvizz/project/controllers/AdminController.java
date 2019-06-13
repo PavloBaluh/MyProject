@@ -11,12 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 
 @RestController
 @AllArgsConstructor
 public class AdminController {
     FoodService foodService;
+
     @PostMapping("/addDish")
     public String addDish(HttpServletRequest request) {
         Food food = null;
@@ -30,8 +33,15 @@ public class AdminController {
     }
 
     @PostMapping("/saveDishPicture")
-    public String saveDishPicture (@RequestPart("fileKey") MultipartFile file){
-        System.out.println(file);
-        return "";
+    public String saveDishPicture(@RequestPart("fileKey") MultipartFile file) {
+        String pass = System.getProperty("user.home" )+ File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects"
+                + File.separator + "FrontForProject" + File.separator + "src" + File.separator + "assets" + File.separator + "restourant" + File.separator + file.getOriginalFilename();
+        try {
+            System.out.println(pass);
+            file.transferTo(new File(pass));
+        } catch (IOException e) {
+            return null;
+        }
+        return "OK";
     }
 }
