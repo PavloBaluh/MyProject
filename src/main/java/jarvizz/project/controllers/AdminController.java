@@ -28,13 +28,18 @@ public class AdminController {
         } catch (IOException e) {
             return null;
         }
-        foodService.save(food);
+        Food byName = foodService.findByName(food.getName());
+        if (byName != null) {
+            Food updated = new Food(byName.getId(),food.getName(),food.getType(),food.getWeight(),food.getPrice(),food.getDescription(),food.getPicture());
+            foodService.save(updated);
+        }
+        else {foodService.save(food);}
         return "OK";
     }
 
     @PostMapping("/saveDishPicture")
     public String saveDishPicture(@RequestPart("fileKey") MultipartFile file) {
-        String pass = System.getProperty("user.home" )+ File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects"
+        String pass = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects"
                 + File.separator + "FrontForProject" + File.separator + "src" + File.separator + "assets" + File.separator + "restourant" + File.separator + file.getOriginalFilename();
         try {
             System.out.println(pass);

@@ -45,9 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll()
                 .and()
                 .addFilterBefore(new RequestProcessingJWTFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new LoginFilter("/login", authenticationManager(),userService, passwordEncoder), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new AdminLoginFilter("/AdminLogin",authenticationManager(),userService,passwordEncoder), UsernamePasswordAuthenticationFilter.class);
-
+                .addFilterBefore(new LoginFilter("/login", authenticationManager(),userService, passwordEncoder), UsernamePasswordAuthenticationFilter.class);
     }
 
 

@@ -51,6 +51,12 @@ public class MainController {
 
         return bad;
     }
+    @GetMapping("/getPermissions")
+    public String getPermissions (){
+        String authentication = SecurityContextHolder.getContext().getAuthentication().getName();
+        User byName = userService.findByName(authentication);
+        return byName.getRoles().toString();
+    }
 
     @PostMapping("/fileUpload")
     public String fileUpload(@RequestPart("fileKey") MultipartFile file) throws IOException {
@@ -131,6 +137,9 @@ public class MainController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String name = authentication.getName();
         User user = userService.findByName(name);
+        if (user.getUserInfo() == null){
+            return null;
+        }
         return user.getUserInfo();
     }
 

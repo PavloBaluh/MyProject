@@ -49,10 +49,20 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException {
         creds = new ObjectMapper().readValue(httpServletRequest.getInputStream(), AccountCredentials.class);
+        //if user
         User byName = userService.findByName(creds.getUsername());
         if (userService.findByName(creds.getUsername()) != null && passwordEncoder.matches(creds.getPassword(),byName.getPassword()) && byName.isEnabled() && byName.getRoles() == Roles.ROLE_USER) {
             return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(), creds.getPassword(),byName.getAuthorities()));
         }
+        //if admin
+        if (creds.getUsername().equals(SuperUser.getInstance().getUsername()) && creds.getPassword().equals(SuperUser.getInstance().getPassword())) {
+            User user = new User(creds.getUsername(), passwordEncoder.encode(creds.getPassword()), Roles.ROLE_ADMIN, true);
+            if (byName == null) {
+                userService.save(user);
+            }
+            return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(creds.getUsername(), creds.getPassword(),user.getAuthorities()));
+        }
+
         else return null;
     }
     @Override

@@ -45,7 +45,8 @@ public class Food implements Serializable {
         this.user = user;
     }
 
-    public Food(String name, Type type, float weight, float price, String description, String picture) {
+    public Food( int id, String name, Type type, float weight, float price, String description, String picture) {
+        this.id = id;
         this.name = name;
         this.type = type;
         this.weight = weight;
@@ -53,5 +54,6 @@ public class Food implements Serializable {
         this.description = description;
         this.picture = picture;
     }
+
 }
 
