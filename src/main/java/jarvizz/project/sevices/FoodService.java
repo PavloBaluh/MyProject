@@ -7,11 +7,14 @@ import jarvizz.project.models.User;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
+@Transactional
 public class FoodService {
     @Autowired
     FoodDao foodDao;
@@ -34,8 +37,9 @@ public class FoodService {
         return foodDao.findById(id);
     }
 
-    public void  deleteByid(int id){
-         foodDao.deleteById(id);
+    public boolean  deleteByName(String name){
+        foodDao.deleteByName(name);
+        return foodDao.findByName(name) == null;
     }
     public Food  findByName(String name){
         return foodDao.findByName(name);

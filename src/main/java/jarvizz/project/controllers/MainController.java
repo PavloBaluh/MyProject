@@ -32,7 +32,6 @@ public class MainController {
     PasswordEncoder passwordEncoder;
     MailService mailService;
     UserInfoService userInfoService;
-    CardInfoService cardInfoService;
     OrderService orderService;
 
     @PostMapping("/register")
@@ -66,7 +65,6 @@ public class MainController {
        String pass = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources"
                 + File.separator + "static" + File.separator + "assets" + File.separator + "usersImages" + File.separator;
         if (byName.getUserInfo().getPicture() != null){
-            System.out.println(byName.getUserInfo().getPicture());
             String picture = byName.getUserInfo().getPicture();
              File file1 = new File(pass + picture);
              file1.delete();

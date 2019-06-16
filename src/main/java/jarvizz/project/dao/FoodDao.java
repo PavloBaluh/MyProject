@@ -13,6 +13,6 @@ public interface FoodDao extends JpaRepository<Food, Integer> {
     List<Food> findAllByType(Type type);
     Food findById(int id);
     List<Food> findAll();
-    void deleteById(Integer integer);
+    void deleteByName(String name);
     Food findByName(String name);
 }
