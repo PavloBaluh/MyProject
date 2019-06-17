@@ -6,16 +6,14 @@ import jarvizz.project.models.Orders;
 import jarvizz.project.sevices.FoodService;
 import jarvizz.project.sevices.OrderService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -54,7 +52,7 @@ public class AdminController {
     }
 
     @PostMapping("/deleteDish")
-    public boolean deleteDish(HttpServletRequest request){
+    public boolean deleteDish(HttpServletRequest request) {
         byte[] bytes = new byte[50];
         try {
             request.getInputStream().read(bytes);
@@ -64,18 +62,63 @@ public class AdminController {
             if (byName != null) {
                 String pass = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects"
                         + File.separator + "FrontForProject" + File.separator + "src" + File.separator + "assets" + File.separator + "restourant" + File.separator;
-                File file = new File(pass +byName.getPicture());
+                File file = new File(pass + byName.getPicture());
                 file.delete();
                 return foodService.deleteByName(substring);
-            }
-            else return false;
+            } else return false;
         } catch (IOException e) {
             return false;
         }
     }
+
     @GetMapping("/getOrders")
-    public List<Orders> getOrders (){
+    public List<Orders> getOrders() {
+        List<Orders> sortedOrders = new ArrayList<>();
         List<Orders> allOrders = orderService.getAllOrders();
-        return allOrders;
+        for (int i = allOrders.size() - 1; i >= 0; i--) {
+             sortedOrders.add(allOrders.get(i));
+        }
+        return sortedOrders;
+    }
+
+    @GetMapping("/getSortedOrders/{sort}")
+    public List<Orders> getSortedOrders(@PathVariable("sort") String sort) {
+        List<Orders> allOrders = orderService.getAllOrders();
+        if (sort.equals("date-old")){
+            return allOrders;
+        }
+        else if(sort.equals("date-new") || sort.equals("All")){
+            List<Orders> sortedOrders = new ArrayList<>();
+            for (int i = allOrders.size() - 1; i >= 0; i--) {
+                sortedOrders.add(allOrders.get(i));
+            }
+            return sortedOrders;
+        }
+        else if (sort.equals("name")){
+            allOrders.sort((o1, o2) -> {
+                if (o1.getName().equals(o2.getName())){
+                    return o1.getSurname().compareTo(o2.getSurname());
+                }
+                return o1.getName().compareTo(o2.getName());
+            });
+            return allOrders;
+        }
+        else if (sort.equals("Done")){
+            return allOrders.stream().filter(Orders::isDone).collect(Collectors.toList());
+        }
+        else if (sort.equals("Non-Done")){
+            return allOrders.stream().filter(orders -> !orders.isDone() ).collect(Collectors.toList());
+        }
+
+        return new ArrayList<>();
+    }
+
+
+    @GetMapping("/ApplyOrder/{id}")
+    public String ApplyOrder (@PathVariable("id") Integer id) {
+        Orders byId = orderService.findById(id);
+        byId.setDone(true);
+        orderService.save(byId);
+        return "OK";
     }
 }

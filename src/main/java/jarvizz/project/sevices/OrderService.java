@@ -18,4 +18,7 @@ public class OrderService {
     public List<Orders> getAllOrders(){
         return this.orderDao.findAll();
     }
+    public Orders findById(int id){
+        return orderDao.getOne(id);
+    }
 }
