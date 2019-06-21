@@ -21,4 +21,7 @@ public class OrderService {
     public Orders findById(int id){
         return orderDao.getOne(id);
     }
+    public  void  delete(Orders orders){
+        orderDao.deleteById(orders.getId());
+    }
 }

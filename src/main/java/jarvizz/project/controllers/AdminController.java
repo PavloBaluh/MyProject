@@ -3,8 +3,12 @@ package jarvizz.project.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jarvizz.project.models.Food;
 import jarvizz.project.models.Orders;
+import jarvizz.project.models.User;
+import jarvizz.project.models.UserInfo;
 import jarvizz.project.sevices.FoodService;
 import jarvizz.project.sevices.OrderService;
+import jarvizz.project.sevices.UserInfoService;
+import jarvizz.project.sevices.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +24,8 @@ import java.util.stream.Collectors;
 public class AdminController {
     FoodService foodService;
     OrderService orderService;
+    UserInfoService userInfoService;
+    UserService userService;
 
     @PostMapping("/addDish")
     public String addDish(HttpServletRequest request) {
@@ -119,6 +125,31 @@ public class AdminController {
         Orders byId = orderService.findById(id);
         byId.setDone(true);
         orderService.save(byId);
+        User user = byId.getUser();
+        if (user != null){
+            if (user.getUserInfo() == null){
+                UserInfo userInfo = new UserInfo(byId.getName(),byId.getSurname(),byId.getPhoneNumber(),byId.getAddress(),byId.getBonus());
+                userInfo.setUser(user);
+                userInfoService.save(userInfo);
+                user.setUserInfo(userInfo);
+                userService.save(user);
+            }
+            else {
+                UserInfo userInfo = user.getUserInfo();
+                double bonus = userInfo.getBonus() + byId.getBonus();
+                userInfo.setBonus(bonus);
+                userInfoService.save(userInfo);
+                user.setUserInfo(userInfo);
+                userService.save(user);
+            }
+        }
+        return "OK";
+    }
+
+    @GetMapping("/deleteOrder{id}")
+    public String deleteOrder(@PathVariable("id") Integer id){
+        Orders byId = orderService.findById(id);
+        orderService.delete(byId);
         return "OK";
     }
 }

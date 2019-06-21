@@ -27,8 +27,12 @@ public class UserInfo {
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
-
-
+    public UserInfo(String name, String surname, String phoneNumber, String address) {
+        this.name = name;
+        this.surname = surname;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+    }
     public UserInfo(String name, String surname, String phoneNumber, String address, double bonus) {
         this.name = name;
         this.surname = surname;

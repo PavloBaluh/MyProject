@@ -178,15 +178,13 @@ public class MainController {
             orderService.save(orders);
             userService.save(byName);
             if (byName.getUserInfo() == null) {
-                UserInfo userInfo = new UserInfo(orders.getName(), orders.getSurname(), orders.getPhoneNumber(), orders.getAddress(), orders.getBonus());
+                UserInfo userInfo = new UserInfo(orders.getName(), orders.getSurname(), orders.getPhoneNumber(), orders.getAddress());
                 userInfo.setUser(byName);
                 userInfoService.save(userInfo);
                 byName.setUserInfo(userInfo);
                 userService.save(byName);
             } else {
                 UserInfo userInfo = byName.getUserInfo();
-                double bonus = userInfo.getBonus() + orders.getBonus();
-                userInfo.setBonus(bonus);
                 userInfoService.save(userInfo);
                 byName.setUserInfo(userInfo);
                 userService.save(byName);
