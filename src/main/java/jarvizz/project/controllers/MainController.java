@@ -59,19 +59,23 @@ public class MainController {
 
     @PostMapping("/fileUpload")
     public String fileUpload(@RequestPart("fileKey") MultipartFile file) throws IOException {
+        System.out.println(file.getOriginalFilename());
         String authentication = SecurityContextHolder.getContext().getAuthentication().getName();
         User byName = userService.findByName(authentication);
         String encode = Base64.encode(file.getBytes());
-       String pass = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources"
-                + File.separator + "static" + File.separator + "assets" + File.separator + "usersImages" + File.separator;
+        System.out.println( System.getProperty("user.dir"));
+       String pass =  System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources"
+                + File.separator + "static" + File.separator + "assets" + File.separator + "usersImages";
+        File folder = new File(pass);
+        if (!folder.exists()) {
+            boolean mkdir = folder.mkdir();
+            System.out.println(mkdir);
+            System.out.println(folder.exists());
+        }
         if (byName.getUserInfo().getPicture() != null){
             String picture = byName.getUserInfo().getPicture();
-             File file1 = new File(pass + picture);
+             File file1 = new File(pass + File.separator + picture);
              file1.delete();
-        }
-        File file1 = new File(pass);
-        if (!file1.exists()) {
-            file1.mkdir();
         }
         try {
             file.transferTo(new File(pass + File.separator + file.getOriginalFilename()));
