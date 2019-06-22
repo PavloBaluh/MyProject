@@ -68,9 +68,7 @@ public class MainController {
                 + File.separator + "static" + File.separator + "assets" + File.separator + "usersImages";
         File folder = new File(pass);
         if (!folder.exists()) {
-            boolean mkdir = folder.mkdir();
-            System.out.println(mkdir);
-            System.out.println(folder.exists());
+            folder.mkdir();
         }
         if (byName.getUserInfo().getPicture() != null){
             String picture = byName.getUserInfo().getPicture();

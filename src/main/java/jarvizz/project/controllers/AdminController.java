@@ -47,9 +47,10 @@ public class AdminController {
 
     @PostMapping("/saveDishPicture")
     public String saveDishPicture(@RequestPart("fileKey") MultipartFile file) {
-        String pass = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects"
-                + File.separator + "FrontForProject" + File.separator + "src" + File.separator + "assets" + File.separator + "restourant" + File.separator + file.getOriginalFilename();
+        String pass = System.getProperty("user.dir") + File.separator + "target" + File.separator + "classes" + File.separator
+                + "static" + File.separator + "assets" + File.separator + "restourant" + File.separator + file.getOriginalFilename();
         try {
+            System.out.println(file.getOriginalFilename());
             file.transferTo(new File(pass));
         } catch (IOException e) {
             return null;
@@ -66,8 +67,8 @@ public class AdminController {
             String substring = name.substring(name.indexOf("\"") + 1, name.lastIndexOf("\""));
             Food byName = foodService.findByName(substring);
             if (byName != null) {
-                String pass = System.getProperty("user.home") + File.separator + "Desktop" + File.separator + "Work" + File.separator + "Projects"
-                        + File.separator + "FrontForProject" + File.separator + "src" + File.separator + "assets" + File.separator + "restourant" + File.separator;
+                String pass = System.getProperty("user.dir") + File.separator + "target" + File.separator + "classes" + File.separator
+                        + "static" + File.separator + "assets" + File.separator + "restourant" + File.separator;
                 File file = new File(pass + byName.getPicture());
                 file.delete();
                 return foodService.deleteByName(substring);
@@ -82,7 +83,7 @@ public class AdminController {
         List<Orders> sortedOrders = new ArrayList<>();
         List<Orders> allOrders = orderService.getAllOrders();
         for (int i = allOrders.size() - 1; i >= 0; i--) {
-             sortedOrders.add(allOrders.get(i));
+            sortedOrders.add(allOrders.get(i));
         }
         return sortedOrders;
     }
@@ -90,30 +91,26 @@ public class AdminController {
     @GetMapping("/getSortedOrders/{sort}")
     public List<Orders> getSortedOrders(@PathVariable("sort") String sort) {
         List<Orders> allOrders = orderService.getAllOrders();
-        if (sort.equals("date-old")){
+        if (sort.equals("date-old")) {
             return allOrders;
-        }
-        else if(sort.equals("date-new") || sort.equals("All")){
+        } else if (sort.equals("date-new") || sort.equals("All")) {
             List<Orders> sortedOrders = new ArrayList<>();
             for (int i = allOrders.size() - 1; i >= 0; i--) {
                 sortedOrders.add(allOrders.get(i));
             }
             return sortedOrders;
-        }
-        else if (sort.equals("name")){
+        } else if (sort.equals("name")) {
             allOrders.sort((o1, o2) -> {
-                if (o1.getName().equals(o2.getName())){
+                if (o1.getName().equals(o2.getName())) {
                     return o1.getSurname().compareTo(o2.getSurname());
                 }
                 return o1.getName().compareTo(o2.getName());
             });
             return allOrders;
-        }
-        else if (sort.equals("Done")){
+        } else if (sort.equals("Done")) {
             return allOrders.stream().filter(Orders::isDone).collect(Collectors.toList());
-        }
-        else if (sort.equals("Non-Done")){
-            return allOrders.stream().filter(orders -> !orders.isDone() ).collect(Collectors.toList());
+        } else if (sort.equals("Non-Done")) {
+            return allOrders.stream().filter(orders -> !orders.isDone()).collect(Collectors.toList());
         }
 
         return new ArrayList<>();
@@ -121,20 +118,19 @@ public class AdminController {
 
 
     @GetMapping("/ApplyOrder/{id}")
-    public String ApplyOrder (@PathVariable("id") Integer id) {
+    public String ApplyOrder(@PathVariable("id") Integer id) {
         Orders byId = orderService.findById(id);
         byId.setDone(true);
         orderService.save(byId);
         User user = byId.getUser();
-        if (user != null){
-            if (user.getUserInfo() == null){
-                UserInfo userInfo = new UserInfo(byId.getName(),byId.getSurname(),byId.getPhoneNumber(),byId.getAddress(),byId.getBonus());
+        if (user != null) {
+            if (user.getUserInfo() == null) {
+                UserInfo userInfo = new UserInfo(byId.getName(), byId.getSurname(), byId.getPhoneNumber(), byId.getAddress(), byId.getBonus());
                 userInfo.setUser(user);
                 userInfoService.save(userInfo);
                 user.setUserInfo(userInfo);
                 userService.save(user);
-            }
-            else {
+            } else {
                 UserInfo userInfo = user.getUserInfo();
                 double bonus = userInfo.getBonus() + byId.getBonus();
                 userInfo.setBonus(bonus);
@@ -147,7 +143,7 @@ public class AdminController {
     }
 
     @GetMapping("/deleteOrder/{id}")
-    public String deleteOrder(@PathVariable("id") Integer id){
+    public String deleteOrder(@PathVariable("id") Integer id) {
         Orders byId = orderService.findById(id);
         User user = byId.getUser();
         user.getOrders().removeIf((orders -> orders.getId() == id));
