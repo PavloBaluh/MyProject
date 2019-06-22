@@ -40,11 +40,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST,"/updateUserInfo","/addFood").authenticated()
                 .antMatchers(HttpMethod.DELETE, "/deleteFood").authenticated()
                 .antMatchers("/getUserInfo","/history").authenticated()
-//                .antMatchers("/register", "/", "/register/confirm/**","/restaurant/product-category/**","/restaurant").permitAll()
-//                .antMatchers(HttpMethod.POST, "/login", "addFood","/makeOrder/basket/{foods}").permitAll()
+                .antMatchers(HttpMethod.POST, "/addDish","/saveDishPicture","/deleteDish").hasRole("ADMIN")
+                .antMatchers("/getOrders","/getSortedOrders/**","/ApplyOrder/**","/deleteOrder/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
                 .and()
-                .addFilterBefore(new RequestProcessingJWTFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new RequestProcessingJWTFilter(userService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new LoginFilter("/login", authenticationManager(),userService, passwordEncoder), UsernamePasswordAuthenticationFilter.class);
     }
 

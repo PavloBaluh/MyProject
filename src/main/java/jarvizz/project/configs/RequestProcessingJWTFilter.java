@@ -1,6 +1,7 @@
 package jarvizz.project.configs;
 
 import io.jsonwebtoken.Jwts;
+import jarvizz.project.sevices.UserService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,11 @@ import java.util.Collections;
 
 
 public class RequestProcessingJWTFilter extends GenericFilterBean {
+    private UserService userService;
+
+    public RequestProcessingJWTFilter(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -25,7 +31,7 @@ public class RequestProcessingJWTFilter extends GenericFilterBean {
                     .parseClaimsJws(token.replace("Bearer", ""))
                     .getBody()
                     .getSubject();
-            authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+            authentication = new UsernamePasswordAuthenticationToken(user, null, userService.findByName(user).getAuthorities());
         }
         SecurityContextHolder.getContext()
                 .setAuthentication(authentication);

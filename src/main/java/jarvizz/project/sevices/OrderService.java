@@ -4,10 +4,12 @@ import jarvizz.project.dao.OrderDao;
 import jarvizz.project.models.Orders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class OrderService {
     @Autowired
     OrderDao orderDao;
@@ -22,6 +24,7 @@ public class OrderService {
         return orderDao.getOne(id);
     }
     public  void  delete(Orders orders){
-        orderDao.deleteById(orders.getId());
+        System.out.println(orders.getId());
+        orderDao.deleteOrdersById(orders.getId());
     }
 }

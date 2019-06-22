@@ -146,9 +146,22 @@ public class AdminController {
         return "OK";
     }
 
-    @GetMapping("/deleteOrder{id}")
+    @GetMapping("/deleteOrder/{id}")
     public String deleteOrder(@PathVariable("id") Integer id){
         Orders byId = orderService.findById(id);
+        User user = byId.getUser();
+        user.getOrders().removeIf((orders -> orders.getId() == id));
+        List<Food> foods = byId.getFoods();
+        foods.forEach((food -> {
+            List<Orders> orders = food.getOrders();
+            orders.removeIf(orders1 -> orders1.getId() == byId.getId());
+            food.setOrders(orders);
+            foodService.save(food);
+        }));
+        userService.save(user);
+        byId.setUser(null);
+        byId.setFoods(null);
+        orderService.save(byId);
         orderService.delete(byId);
         return "OK";
     }
