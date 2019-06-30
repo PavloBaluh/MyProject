@@ -32,7 +32,6 @@ public class RestaurantController {
     @GetMapping("/restaurant/product-category/{category}")
     public List<Food> category(@PathVariable("category") String category) {
         Type type = Type.valueOf(category.toUpperCase());
-        System.out.println(type);
         return foodService.findAllByType(type);
     }
 

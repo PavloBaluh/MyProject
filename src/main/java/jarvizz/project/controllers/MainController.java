@@ -70,10 +70,12 @@ public class MainController {
         if (!folder.exists()) {
             folder.mkdir();
         }
-        if (byName.getUserInfo().getPicture() != null){
-            String picture = byName.getUserInfo().getPicture();
-             File file1 = new File(pass + File.separator + picture);
-             file1.delete();
+        if (byName.getUserInfo() != null) {
+            if (byName.getUserInfo().getPicture() != null) {
+                String picture = byName.getUserInfo().getPicture();
+                File file1 = new File(pass + File.separator + picture);
+                file1.delete();
+            }
         }
         try {
             file.transferTo(new File(pass + File.separator + file.getOriginalFilename()));
@@ -205,6 +207,22 @@ public class MainController {
         String authentication = SecurityContextHolder.getContext().getAuthentication().getName();
         User byName = userService.findByName(authentication);
         return byName.getOrders();
+    }
+
+    @PostMapping("/repeatOrder/{arr}")
+    public void repeatOrder (@PathVariable("arr")String arr) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User byName = userService.findByName(authentication.getName());
+        String[] split = arr.split(",");
+        List<Food> foods = new ArrayList<>();
+        for (String s : split) {
+            Food food = foodService.findByName(s);
+            List<User> users = food.getUser();
+            users.add(byName);
+            food.setUser(users);
+            foodService.save(food);
+        }
+
     }
 
 
