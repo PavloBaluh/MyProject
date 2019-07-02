@@ -1,5 +1,6 @@
 package jarvizz.project.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jarvizz.project.models.Food;
 import jarvizz.project.models.Type;
 import jarvizz.project.models.User;

@@ -10,6 +10,7 @@ import jarvizz.project.sevices.OrderService;
 import jarvizz.project.sevices.UserInfoService;
 import jarvizz.project.sevices.UserService;
 import lombok.AllArgsConstructor;
+import org.json.JSONException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -160,5 +161,53 @@ public class AdminController {
         orderService.save(byId);
         orderService.delete(byId);
         return "OK";
+    }
+
+    @GetMapping("/getInfoForDiagram")
+    public Map<Integer, List<Orders>> getInfoForDiagram() throws JSONException {
+        Map<Integer,List<Orders>> quarters = new HashMap<>();
+        quarters.put(1, new ArrayList<Orders>());
+        quarters.put(2, new ArrayList<Orders>());
+        quarters.put(3, new ArrayList<Orders>());
+        quarters.put(4, new ArrayList<Orders>());
+        List<Orders> allOrders = orderService.getAllOrders();
+        allOrders.forEach((order) -> {
+            int date = Integer.parseInt(order.getDate().substring(5,7));
+            if (date >= 1 && date <= 3 ){
+                List<Orders> orders = quarters.get(1);
+                orders.add(order);
+                quarters.put(1,orders);
+            }
+            if (date >= 4 && date <= 6 ){
+                List<Orders> orders = quarters.get(2);
+                orders.add(order);
+                quarters.put(2,orders);
+            }
+            if (date >= 7 && date <= 9 ){
+                List<Orders> orders = quarters.get(3);
+                orders.add(order);
+                quarters.put(3,orders);
+            }
+            if (date >= 10 && date <= 12 ){
+                List<Orders> orders = quarters.get(4);
+                orders.add(order);
+                quarters.put(4,orders);
+            }
+        });
+        System.out.println(quarters);
+        for (Map.Entry<Integer, List<Orders>> entry : quarters.entrySet()) {
+            System.out.println(entry.getKey() + "/" + entry.getValue());
+        }
+        return  quarters;
+    }
+
+    @GetMapping("/getYears")
+    public TreeSet<Integer> GetYears (){
+        TreeSet<Integer> years = new TreeSet<>();
+        List<Orders> allOrders = orderService.getAllOrders();
+        allOrders.forEach((order) -> {
+            years.add(Integer.parseInt(order.getDate().substring(0,4)));
+        });
+        return years;
     }
 }
