@@ -165,49 +165,65 @@ public class AdminController {
 
     @GetMapping("/getInfoForDiagram")
     public Map<Integer, List<Orders>> getInfoForDiagram() throws JSONException {
-        Map<Integer,List<Orders>> quarters = new HashMap<>();
+        Map<Integer, List<Orders>> quarters = new HashMap<>();
         quarters.put(1, new ArrayList<Orders>());
         quarters.put(2, new ArrayList<Orders>());
         quarters.put(3, new ArrayList<Orders>());
         quarters.put(4, new ArrayList<Orders>());
         List<Orders> allOrders = orderService.getAllOrders();
         allOrders.forEach((order) -> {
-            int date = Integer.parseInt(order.getDate().substring(5,7));
-            if (date >= 1 && date <= 3 ){
+            int date = Integer.parseInt(order.getDate().substring(5, 7));
+            if (date >= 1 && date <= 3) {
                 List<Orders> orders = quarters.get(1);
                 orders.add(order);
-                quarters.put(1,orders);
+                quarters.put(1, orders);
             }
-            if (date >= 4 && date <= 6 ){
+            if (date >= 4 && date <= 6) {
                 List<Orders> orders = quarters.get(2);
                 orders.add(order);
-                quarters.put(2,orders);
+                quarters.put(2, orders);
             }
-            if (date >= 7 && date <= 9 ){
+            if (date >= 7 && date <= 9) {
                 List<Orders> orders = quarters.get(3);
                 orders.add(order);
-                quarters.put(3,orders);
+                quarters.put(3, orders);
             }
-            if (date >= 10 && date <= 12 ){
+            if (date >= 10 && date <= 12) {
                 List<Orders> orders = quarters.get(4);
                 orders.add(order);
-                quarters.put(4,orders);
+                quarters.put(4, orders);
             }
         });
-        System.out.println(quarters);
-        for (Map.Entry<Integer, List<Orders>> entry : quarters.entrySet()) {
-            System.out.println(entry.getKey() + "/" + entry.getValue());
-        }
-        return  quarters;
+        return quarters;
     }
 
     @GetMapping("/getYears")
-    public TreeSet<Integer> GetYears (){
+    public TreeSet<Integer> GetYears() {
         TreeSet<Integer> years = new TreeSet<>();
         List<Orders> allOrders = orderService.getAllOrders();
         allOrders.forEach((order) -> {
-            years.add(Integer.parseInt(order.getDate().substring(0,4)));
+            years.add(Integer.parseInt(order.getDate().substring(0, 4)));
         });
         return years;
+    }
+
+    @GetMapping("/GetOrdersByMounce")
+    public HashMap<Integer, List<Orders>> GetOrdersByMounce() {
+        List<Orders> allOrders = orderService.getAllOrders();
+        HashMap<Integer, List<Orders>> map = new HashMap<>();
+        for (int i = 1; i <= 12; i++) {
+            map.put(i, new ArrayList<>());
+        }
+        for (Orders order : allOrders) {
+            int date = Integer.parseInt(order.getDate().substring(5, 7));
+            for (Map.Entry<Integer, List<Orders>> entry : map.entrySet()) {
+                if (entry.getKey() == date){
+                    List<Orders> value = entry.getValue();
+                    value.add(order);
+                    entry.setValue(value);
+                }
+            }
+        }
+        return map;
     }
 }
