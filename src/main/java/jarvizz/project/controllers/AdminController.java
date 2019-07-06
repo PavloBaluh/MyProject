@@ -217,7 +217,7 @@ public class AdminController {
         for (Orders order : allOrders) {
             int date = Integer.parseInt(order.getDate().substring(5, 7));
             for (Map.Entry<Integer, List<Orders>> entry : map.entrySet()) {
-                if (entry.getKey() == date){
+                if (entry.getKey() == date) {
                     List<Orders> value = entry.getValue();
                     value.add(order);
                     entry.setValue(value);
@@ -225,5 +225,70 @@ public class AdminController {
             }
         }
         return map;
+    }
+
+    @PostMapping("/getForRelationsDiagram")
+    public HashMap<String, Integer> getForRelationsDiagram(@RequestHeader("values") String val) {
+        HashMap<String, Integer> res = new HashMap<>();
+        String[] split = val.split(",");
+        if (split[0].equals("quarter")) {
+            int neededQuartel = Integer.parseInt(split[1]);
+            if (split[2].equals("all")) {
+                List<Orders> allOrders = orderService.getAllOrders();
+                res = CalcMethod(allOrders, neededQuartel);
+            }
+            else {
+                ArrayList<Orders> OrdersByYear = new ArrayList<>();
+                List<Orders> allOrders = orderService.getAllOrders();
+                allOrders.forEach((order -> {
+                    int i = Integer.parseInt(order.getDate().substring(0, 4));
+                    if (i == Integer.parseInt(split[2])){
+                        OrdersByYear.add(order);
+                    }
+                }));
+                res  = CalcMethod(OrdersByYear, neededQuartel);
+            }
+        }
+        return res ;
+    }
+
+    public HashMap<String, Integer> CalcMethod(List<Orders> allOrders, int neededQuartal){
+        int currentQuartal = 0;
+        List<Orders> ordersByQuartal = new ArrayList<>();
+        for (Orders order : allOrders) {
+            int date = Integer.parseInt(order.getDate().substring(5, 7));
+            if (date >= 1 && date <= 3) {
+                currentQuartal = 1;
+            }
+            if (date >= 4 && date <= 6) {
+                currentQuartal = 2;
+            }
+            if (date >= 7 && date <= 9) {
+                currentQuartal = 3;
+            }
+            if (date >= 10 && date <= 12) {
+                currentQuartal = 4;
+            }
+            if (neededQuartal == currentQuartal) {
+                ordersByQuartal.add(order);
+            }
+        }
+        HashMap<String, Integer> res = new HashMap<>();
+        for (Orders order : ordersByQuartal) {
+            for (Food food : order.getFoods()) {
+                if (!res.containsKey(food.getName())) {
+                    res.put(food.getName(), 0);
+                }
+                if (res.containsKey(food.getName())) {
+                    Set<Map.Entry<String, Integer>> entries = res.entrySet();
+                    for (Map.Entry<String, Integer> entry : entries) {
+                        if (entry.getKey().equals(food.getName())) {
+                            entry.setValue(entry.getValue() + 1);
+                        }
+                    }
+                }
+            }
+        }
+        return res;
     }
 }
